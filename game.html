@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title> FUGINDO DOS ASTERÓIDES</title>
+</head>
+
+<body style="background-color:rgb(2, 3, 15);">
+	<font face="Verdana" size="3">
+    <div style="text-align:center"><h2 style="color:rgb(255, 255, 255);">Ajude o capitão Guapo a chegar em segurança a base!</h2>
+    <p style="color:rgb(255, 255, 255);">- Controle a nave usando as setas do teclado.</p>
+    <p style="color:rgb(255, 255, 255);">- Pressione espaço para atirar mísseis</p>
+    <p style="color:rgb(255, 255, 255);">- Cada segundo em jogo equivale a um ponto</p>
+ 
+    <style>
+        body {
+          background-image: url('imagens/fundo.png');
+          background-repeat: no-repeat;
+          background-position: 50% 93%;
+        }
+        </style>
+
+    <canvas id="minha-tela" width="800" height="400" style="border: rgb(255, 255, 255) solid 1px;"> </canvas>
+</font>
+</div>
+</body>
+<script>
+
+	var canvas = document.getElementById("minha-tela");
+	var context = canvas.getContext("2d");
+	context.font = "20px Verdana";
+
+	 // Dados dos asteroides
+     var x_a1 = 800;
+     var y_a1 = aleatorio(0, 370);     	
+	 var e_a1 = 0;
+     var x_a2 = 1000;
+     var y_a2 = aleatorio(0, 370);     	 
+	 var e_a2 = 0;	 
+     var x_a3 = 1200;
+     var y_a3 = aleatorio(0, 370);     	
+	 var e_a3 = 0;	 
+	 var tam_asteroide = 30;
+	 var img_asteroide = new Image(tam_asteroide, tam_asteroide);
+	 img_asteroide.src = 'imagens/asteroide.png';
+	 var img_explosao_asteroide1 = new Image(tam_asteroide, tam_asteroide);
+	 img_explosao_asteroide1.src = 'imagens/explosao_asteroide_1.png';		 	 
+	 var tImagem_e1 = new Date().getTime();	 	 
+	 var trocarImagem_e1 = 0;	 
+	 var img_explosao_asteroide2 = new Image(tam_asteroide, tam_asteroide);
+	 img_explosao_asteroide2.src = 'imagens/explosao_asteroide_2.png';		 	 	 
+	 var tImagem_e2 = new Date().getTime();	 	 
+	 var trocarImagem_e2 = 0;	 	 
+	 var img_explosao_asteroide3 = new Image(tam_asteroide, tam_asteroide);
+	 img_explosao_asteroide3.src = 'imagens/explosao_asteroide_3.png';		 	 	 
+	 var tImagem_e3 = new Date().getTime();	 	 
+	 var trocarImagem_e3 = 0;	 	 
+
+	 // Dados da Nave
+	 var x_nave = 50;		 
+	 var y_nave = 180;	
+	 var tam_nave = 40;
+	 var img_nave = new Image(tam_nave, tam_nave);
+	 img_nave.src = 'imagens/nave.png';
+	 var img_nave2 = new Image(tam_nave, tam_nave);
+	 img_nave2.src = 'imagens/nave2.png';	
+	 var img_explosao_nave = new Image(tam_nave, tam_nave);
+	 img_explosao_nave.src = 'imagens/explosao_nave.png';		 
+	 var qual_nave = 1; 
+
+	 // Dados do Míssil
+	 var x_missil = 0;		 
+	 var y_missil = 0;	
+	 var fire_missil = 0;
+	 var velocidade_missil = 25;	 
+			 
+	 var velocidade = 5;
+	 var distancia = 1000;
+	 var fase = 1;
+	 var pontos = 0;
+	 var pontosTotal = 0;
+	 var tInicial = new Date().getTime();	 
+	 var tImagem = new Date().getTime();	 	 
+	 var trocarImagem = 0;
+     
+     requestAnimationFrame(gameloop);
+      	 
+	 window.onkeydown = teclapressionada; 
+
+     function teclapressionada(tecla){
+
+	 		if(tecla.keyCode == 38) {
+				y_nave = y_nave - 10; 
+				if (y_nave < 0) {
+					y_nave = 0;
+				}
+			}
+			if(tecla.keyCode == 40) {
+				y_nave = y_nave + 10; 
+				if (y_nave > 360) {
+					y_nave = 360;
+				}			
+			}	 
+			if(tecla.keyCode == 39) {
+				x_nave = x_nave + 10; 
+				if (x_nave > 760) {
+					x_nave = 760;
+				}				
+			}
+			if(tecla.keyCode == 37) {
+		    	x_nave = x_nave - 10; 
+				if (x_nave < 0) {
+					x_nave = 0;
+				}			
+			}	
+			if(tecla.keyCode == 32 && fire_missil == 0) {
+				fire_missil = 1;
+				y_missil = y_nave + 20;
+				x_missil = x_nave + 42;					
+			}		
+	 }		
+
+     function gameloop() {              			 
+		 context.clearRect(0, 0, 800, 400);
+		 tAtual = new Date().getTime();
+         context.font = "20px Verdana";
+         context.strokeStyle = "white";   
+		 context.strokeText('Base a ' + distancia + ' km',5,395);		    
+		 context.strokeText('Fase: ' + fase,300,395);		    		 
+		 context.strokeText('Pontos: ' + (pontos+pontosTotal),500,395);				 
+		 desenharNave(x_nave, y_nave);
+		 trocarImagem = Math.floor((tAtual - tImagem)/10);
+		 if (trocarImagem > 5) {
+			tImagem = new Date().getTime();
+			trocarImagem = 0;
+			qual_nave = (qual_nave==1 ? 2 : 1);
+  		}
+		 desenharAsteroide(1,x_a1,y_a1);
+         desenharAsteroide(2,x_a2,y_a2);		         		  
+         desenharAsteroide(3,x_a3,y_a3);	    
+		 if (distancia > 0) {
+			pontos = Math.floor((tAtual - tInicial)/1000);
+		 }
+	       	
+		 if (colisao()) {
+			context.drawImage(img_explosao_nave, x_nave, y_nave, tam_nave, tam_nave);		 			 
+			context.font = "40px Verdana";
+			context.fillStyle = "white";
+			context.fillText("GAME OVER",canvas.width/2-125,canvas.height/2);
+            
+		} else {
+			requestAnimationFrame(gameloop);
+		};  		 	
+		 x_a1 = x_a1 - velocidade; 
+		 if (x_a1 <= -200 && distancia > 150) {
+			 x_a1 = aleatorio(800, 1000);
+			 y_a1 = aleatorio(0, 370);
+			 p_a1 = 1;
+			 e_a1 = 0;
+		};		 
+		x_a2 = x_a2 - velocidade; 	
+		if (x_a2 <= -200 && distancia > 150) {
+			 x_a2 = aleatorio(800, 1000);
+			 y_a2 = aleatorio(0, 370);
+			 p_a2 = 1;
+			 e_a2 = 0;			 
+		};			
+		x_a3 = x_a3 - velocidade; 				
+		if (x_a3 <= -200 && distancia > 150) {
+			 x_a3 = aleatorio(800, 1000);
+			 y_a3 = aleatorio(0, 370);
+			 p_a3 = 1;
+			 e_a3 = 0;			 
+		};		
+		if (fire_missil == 1) {
+		  context.fillStyle = "rgb(255,225,0)";  		
+          context.fillRect(x_missil, y_missil, 60, 2); 		
+		  x_missil = x_missil + velocidade_missil;
+		  if (x_missil > 800) {
+			  fire_missil = 0;
+		  }		
+		  if ((((x_a1+tam_asteroide)>x_missil && x_a1<(x_missil+2)) && ((y_a1+tam_asteroide)>y_missil && y_a1<(y_missil+2))) && (e_a1==0)) {
+			e_a1 = 1;	
+			fire_missil = 0;			
+			tImagem_e1 = new Date().getTime()			
+			var trocarImagem_e1 = 0;			
+		  }
+		  if ((((x_a2+tam_asteroide)>x_missil && x_a2<(x_missil+2)) && ((y_a2+tam_asteroide)>y_missil && y_a2<(y_missil+2))) && (e_a2==0)) {
+			e_a2 = 1;	
+			fire_missil = 0;			
+			tImagem_e2 = new Date().getTime()			
+			var trocarImagem_e2 = 0;						
+		  }		  
+		  if ((((x_a3+tam_asteroide)>x_missil && x_a3<(x_missil+2)) && ((y_a3+tam_asteroide)>y_missil && y_a3<(y_missil+2))) && (e_a3==0)) {
+			e_a3 = 1;	
+			fire_missil = 0;	
+			tImagem_e3 = new Date().getTime()			
+			var trocarImagem_e3 = 0;								
+		  }				  
+		}
+
+		if (distancia > 0) 
+		{
+			distancia = distancia - 1;	
+		} 
+		else 
+		{
+			x_nave = x_nave + velocidade;
+			if (x_nave > 810) {
+				fase++;
+				alert("Parabéns! Você passou para a fase "+fase);		
+				velocidade = velocidade + 2;
+	            distancia = 1000;						
+				x_nave = 50;
+				tInicial = new Date().getTime();	 
+				tAtual = new Date().getTime();	 
+				tImagem = new Date().getTime();
+				pontosTotal = pontosTotal + pontos;								
+			}
+		};
+     }
+     
+	 function colisao() {
+		if( (((x_a1+tam_asteroide)>x_nave && x_a1<(x_nave+tam_nave)) && ((y_a1+tam_asteroide)>y_nave && y_a1<(y_nave+tam_nave)) && (e_a1==0)) || 
+		    (((x_a2+tam_asteroide)>x_nave && x_a2<(x_nave+tam_nave)) && ((y_a2+tam_asteroide)>y_nave && y_a2<(y_nave+tam_nave)) && (e_a2==0)) || 
+		    (((x_a3+tam_asteroide)>x_nave && x_a3<(x_nave+tam_nave)) && ((y_a3+tam_asteroide)>y_nave && y_a3<(y_nave+tam_nave)) && (e_a3==0)) )	{
+			return true;			
+		} else {
+			return false;
+		}
+	 }	 
+
+	 function desenharAsteroide(i, x, y)
+     {
+		if (((i==1) && (e_a1>0)) || ((i==2) && (e_a2>0)) || ((i==3) && (e_a3>0))) {
+			if ((i==1) && (e_a1>0))	{
+				trocarImagem_e1 = Math.floor((tAtual - tImagem_e1)/10);
+				if ((trocarImagem_e1>=0) && (trocarImagem_e1<5)) {
+					context.drawImage(img_explosao_asteroide1, x, y, tam_asteroide, tam_asteroide);		 		  
+				}
+				if ((trocarImagem_e1>=5) && (trocarImagem_e1<10)) {
+					context.drawImage(img_explosao_asteroide2, x, y, tam_asteroide, tam_asteroide);		 		  
+				}				
+				if ((trocarImagem_e1>=10) && (trocarImagem_e1<25)) {
+					context.drawImage(img_explosao_asteroide3, x, y, tam_asteroide, tam_asteroide);		 		  
+				}								
+			}		
+			if ((i==2) && (e_a2>0))	{
+				trocarImagem_e2 = Math.floor((tAtual - tImagem_e2)/10);
+				if ((trocarImagem_e2>=0) && (trocarImagem_e2<5)) {
+					context.drawImage(img_explosao_asteroide1, x, y, tam_asteroide, tam_asteroide);		 		  
+				}
+				if ((trocarImagem_e2>=5) && (trocarImagem_e2<10)) {
+					context.drawImage(img_explosao_asteroide2, x, y, tam_asteroide, tam_asteroide);		 		  
+				}				
+				if ((trocarImagem_e2>=10) && (trocarImagem_e2<25)) {
+					context.drawImage(img_explosao_asteroide3, x, y, tam_asteroide, tam_asteroide);		 		  
+				}								
+			}			
+			if ((i==3) && (e_a3>0))	{
+				trocarImagem_e3 = Math.floor((tAtual - tImagem_e3)/10);
+				if ((trocarImagem_e3>=0) && (trocarImagem_e3<5)) {
+					context.drawImage(img_explosao_asteroide1, x, y, tam_asteroide, tam_asteroide);		 		  
+				}
+				if ((trocarImagem_e3>=5) && (trocarImagem_e3<10)) {
+					context.drawImage(img_explosao_asteroide2, x, y, tam_asteroide, tam_asteroide);		 		  
+				}				
+				if ((trocarImagem_e3>=10) && (trocarImagem_e3<25)) {
+					context.drawImage(img_explosao_asteroide3, x, y, tam_asteroide, tam_asteroide);		 		  
+				}								
+			}			
+		}
+		else {
+		 context.drawImage(img_asteroide, x, y, tam_asteroide, tam_asteroide);		 		  
+		}
+     }
+
+	 function desenharNave(x, y)
+     {
+		 if (qual_nave == 1) {
+			context.drawImage(img_nave, x, y, tam_nave, tam_nave);		 
+		 }
+		 else
+		 {
+			context.drawImage(img_nave2, x, y, tam_nave, tam_nave);		 			 
+		 }
+		 
+     }	 
+
+	 function aleatorio(min, max) {
+		return Math.random() * (max - min) + min;	 
+	 }
+
+</script>
+
+</html>
